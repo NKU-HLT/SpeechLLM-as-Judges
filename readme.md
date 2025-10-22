@@ -15,20 +15,32 @@ pip install -r requirements.txt
 
 The pre-trained checkpoints can be downloaded through belowing links
 
+Minimal working example:
+```python
 
+```
 
 ### 3. Data 
 Following dataset are used in our project:
 
 ### 4. Training
 To train the model
-Stage I:
 
+Stage I:
+```python
+
+```
 
 stage II:
+```python
+
+```
 
 ### 5. test
 
+```python
+
+```
 
 ### Acknowledgement
 
