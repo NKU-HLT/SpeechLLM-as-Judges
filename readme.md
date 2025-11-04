@@ -12,41 +12,100 @@ conda activate speecheval
 pip install -r requirements.txt
 ```
 
-## 2. Pretrained Checkpoints & Inference
-Download the latest checkpoints from [Google Drive](https://drive.google.com/file/d/1buq7L1nHKHYZNooFQeXeU2Un1RkepKI2/view?usp=drive_link) and unzip them into your workspace. Suppose the adapter weights reside at `path/to/checkpoint`.
-
-Run inference with `swift`:
+For Qwen3-8B deployment, we provide a `requirements_qwen3.txt`:
 
 ```bash
-CUDA_VISIBLE_DEVICES=5 \
-swift infer \
-  --model_type qwen2_5_omni \
-  --adapters path/to/checkpoint \
-  --val_dataset example/test.json \
-  --temperature 0 \
-  --max_batch_size 2 \
-  --max_new_tokens 2048 \
-  --result_path example/output.json
+conda create -n qwen3_reward python=3.10
+conda activate qwen3_reward
+pip install -r requirements_qwen3.txt
 ```
 
-Change `CUDA_VISIBLE_DEVICES`, the adapter path, or the evaluation JSON as needed. The generated results are stored in `example/output.json`.
+## 2. Pretrained Checkpoints & Inference
+
+Download the latest checkpoints from [Google Drive](https://drive.google.com/file/d/1buq7L1nHKHYZNooFQeXeU2Un1RkepKI2/view?usp=drive_link) and unzip them into your workspace. Suppose the adapter weights reside at `path/to/checkpoint`.
+
+Run inference with swift:
+
+```bash
+cd script/
+CUDA_VISIBLE_DEVICES=0 \
+bash inference.sh \
+"path/to/checkpoint" \
+"swift_style_test/split_data_single_eval/test/multitask.jsonl" \
+"path/to/checkpoint/results_inference.jsonl"
+```
+
+Run inference (`fake detection`) with swift:
+
+```bash
+cd script/
+CUDA_VISIBLE_DEVICES=0 \
+bash inference.sh \
+"path/to/checkpoint" \
+"swift_style_test/split_data_single_eval/test/multitask.jsonl" \
+"path/to/checkpoint/results_inference.jsonl"
+```
+
+Change `CUDA_VISIBLE_DEVICES`, the adapter path, or the evaluation JSON as needed. The generated results are stored in `path/to/checkpoint/results_inference.jsonl`.
 
 ## 3. Training
 The training data is hosted on [Hugging Face](https://huggingface.co/datasets/Hui519/SpeechEval).
 
-### Stage I
+### SFT
 ```bash
-bash train_stage1.sh
+cd script/
+CUDA_VISIBLE_DEVICES=0,1,2,3 \
+bash qwenomni_train_ratio.sh \
+"pretrain_model/Qwen25-Omni-7B" \
+"checkpoint/" \
+"data_dev" \
+setting_ratio_thinkcot \
+'["SingleEval","CompareEval","Suggest","FakeDetection"]' \
+v0 \
+8 \
+50 \
+23450 \
+4 \
+'[1.0,1.0,1.0,3.0]'
 ```
 
-### Stage II
+### GRPO
+Deploy Qwen3-8B for GRPO training:
 ```bash
-bash train_stage2.sh
+cd script/
+CUDA_VISIBLE_DEVICES=0 \
+bash grpo_deploy_qwen3.sh \
+"pretrain_model/Qwen3-8B"
+```
+GRPO training:
+```bash
+cd script/
+CUDA_VISIBLE_DEVICES=0,1,2,3 \
+bash grpo_train.sh \
+"checkpoint-2000-merged" \
+"all_grpo_think_format/train.jsonl" \
+"all_grpo_think_format/val.jsonl#1000" \
+"evaluate/plugin/plugin.py" \
+"checkpoint/qwenomni_grpo_cot_4_reward" \
+"external_my_multitask_qwen_help,external_my_multitask_qwen_relevance,external_my_multitask_qwen_accuracy,external_my_multitask_qwen_detail" \
+1,1,2,0.5 \
+4 \
 ```
 
 ## 4. Evaluation
+For deepseek api evaluation, you can follow the instructions in `evaluate/`.
+
+For fake detection evaluation, use:
 ```bash
-bash test.sh
+cd evaluate/fake_detection/
+python fakedetection_soft.py \
+    output.jsonl \
+    fake_detection_eval.txt
+    
+python calculate_metrics.py \
+    fake_detection_eval.txt \
+    fake_detection_metrics.txt
+
 ```
 
 ## Acknowledgements
