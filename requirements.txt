@@ -1,0 +1,6 @@
+ms-swift
+torch
+torchvision
+torchaudio
+qwen-omni-utils
+deepspeed
