@@ -197,8 +197,8 @@ def main():
     "Distortion Detail B - Type: jitter, Duration: 0-3.3 s (throughout the recording)",
     "Emotional Impact Type A: Neutral",
     "Emotional Impact Type B: Neutral",
-    "Subjective A - Gender: female, Age: N/A",
-    "Subjective B - Gender: female, Age: N/A"
+    "Subjective A - Gender: female, Age: middle-aged",
+    "Subjective B - Gender: female, Age: middle-aged"
     ]
     context = "\n".join(lines)
     question = "Describe the speech in detail from the quality aspects."

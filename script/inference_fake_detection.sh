@@ -19,8 +19,7 @@ FPS_MAX_FRAMES=12 \
 MAX_PIXELS=1003520 \
 ENABLE_AUDIO_OUTPUT=0 \
 swift infer \
-    --model_type qwen2_5_omni \
-    --adapters $final_ckpt \
+    --model $final_ckpt \
     --val_dataset $val_data_path \
     --temperature 0 \
     --max_new_tokens 512 \
