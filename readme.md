@@ -22,7 +22,7 @@ pip install -r requirements_qwen3.txt
 
 ## 2. Pretrained Checkpoints & Inference
 
-Download the latest checkpoints from [Google Drive](https://drive.google.com/file/d/1buq7L1nHKHYZNooFQeXeU2Un1RkepKI2/view?usp=drive_link) and unzip them into your workspace. Suppose the adapter weights reside at `path/to/checkpoint`.
+Download the latest checkpoints from [Hugging Face](https://huggingface.co/Hui519/speechllm-as-judge-qwen25omni/tree/main) and unzip them into your workspace. Suppose the adapter weights reside at `path/to/checkpoint`.
 
 Run inference with swift:
 
